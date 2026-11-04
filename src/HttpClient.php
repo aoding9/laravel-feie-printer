@@ -1,6 +1,6 @@
 <?php
 
-namespace georgie\LaravelFeiePrinter;
+namespace Georgie\LaravelFeiePrinter;
 
 class HttpClient {
     // Request vars
@@ -69,21 +69,25 @@ class HttpClient {
     }
     function doRequest() {
         if (!$fp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
-            switch($errno) {
+            switch ($errno) {
                 case -3:
                     $this->errormsg = 'Socket creation failed (-3)';
+                    break;
                 case -4:
                     $this->errormsg = 'DNS lookup failure (-4)';
+                    break;
                 case -5:
                     $this->errormsg = 'Connection refused or timed out (-5)';
+                    break;
                 default:
                     $this->errormsg = 'Connection failed ('.$errno.')';
-                $this->errormsg .= ' '.$errstr;
-                $this->debug($this->errormsg);
+                    break;
             }
+            $this->errormsg .= ' '.$errstr;
+            $this->debug($this->errormsg);
             return false;
         }
-        socket_set_timeout($fp, $this->timeout);
+        stream_set_timeout($fp, $this->timeout);
         $request = $this->buildRequest();
         $this->debug('Request', $request);
         fwrite($fp, $request);
@@ -138,7 +142,10 @@ class HttpClient {
         if (isset($this->headers['content-encoding']) && $this->headers['content-encoding'] == 'gzip') {
             $this->debug('Content is gzip encoded, unzipping it');
             $this->content = substr($this->content, 10);
-            $this->content = gzinflate($this->content);
+            $inflated = @gzinflate($this->content);
+            if ($inflated !== false) {
+                $this->content = $inflated;
+            }
         }
         if ($this->persist_cookies && isset($this->headers['set-cookie']) && $this->host == $this->cookie_host) {
             $cookies = $this->headers['set-cookie'];
@@ -167,7 +174,11 @@ class HttpClient {
             $uri = isset($this->headers['uri']) ? $this->headers['uri'] : '';
             if ($location || $uri) {
                 $url = parse_url($location.$uri);
-                return $this->get($url['path']);
+                $path = $url['path'] ?? '/';
+                if (isset($url['query'])) {
+                    $path .= '?'.$url['query'];
+                }
+                return $this->get($path);
             }
         }
         return true;
@@ -306,4 +317,3 @@ class HttpClient {
     }
 }
 
-?>

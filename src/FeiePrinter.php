@@ -44,11 +44,16 @@ class FeiePrinter
         $time = time();         //请求时间
         $printerContent = '';
         foreach ($arr as $index => $item) {
-            if ($index > 0)
-                $printerContent .= '\n';
-            $printerContent = $item->sn . '#' . $item->key;
-            if ($name) $printerContent .= '#' . $item->name;
-            if ($sim) $printerContent .= '#' . $item->sim;
+            if ($index > 0) {
+                $printerContent .= "\n";
+            }
+            $printerContent .= $item->sn . '#' . $item->key;
+            if (!empty($item->name)) {
+                $printerContent .= '#' . $item->name;
+            }
+            if (!empty($item->sim)) {
+                $printerContent .= '#' . $item->sim;
+            }
         }
         $msgInfo = [
             'user' => config('feiE.user'),
