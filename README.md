@@ -3,7 +3,7 @@
 ### 介绍
 飞鹅云打印机 Laravel SDK（`aoding9/laravel-feie-printer` fork）
 
-**运行环境：** PHP **^8.3（含 8.5）**，适配 Laravel 10–13。通过 `replace` 可替代 `georgie/laravel-feie-printer`。
+**运行环境：** PHP **^8.2（含 8.5）**，适配 Laravel 10–13。通过 `replace` 可替代 `georgie/laravel-feie-printer`。
 
 ### 安装教程
 
